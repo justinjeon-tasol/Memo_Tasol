@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">파일저장</string>
+    
+    <!-- Main Screen -->
+    <string name="all_documents">전체</string>
+    <string name="bank_account">통장사본</string>
+    <string name="business_license">사업자등록증</string>
+    <string name="product_photo">제품사진</string>
+    <string name="etc">기타</string>
+    <string name="add_document">문서 추가</string>
+    <string name="search_documents">문서 검색</string>
+    <string name="no_documents">저장된 문서가 없습니다</string>
+    <string name="no_documents_description">통장사본, 사업자등록증 등을 저장하고\n언제든 빠르게 공유하세요</string>
+    <string name="add_first_document">첫 문서 추가하기</string>
+    
+    <!-- Document Detail Screen -->
+    <string name="document_detail">문서 상세</string>
+    <string name="share">공유하기</string>
+    <string name="change_image">이미지 변경</string>
+    <string name="delete">삭제</string>
+    <string name="created_at">생성일</string>
+    <string name="updated_at">수정일</string>
+    <string name="delete_confirmation">이 문서를 삭제하시겠습니까?</string>
+    <string name="delete_confirmation_message">삭제된 문서는 복구할 수 없습니다.</string>
+    <string name="confirm">확인</string>
+    <string name="cancel">취소</string>
+    
+    <!-- Add/Edit Document Screen -->
+    <string name="add_new_document">새 문서 추가</string>
+    <string name="edit_document">문서 수정</string>
+    <string name="title">제목</string>
+    <string name="title_required">제목을 입력하세요</string>
+    <string name="category">카테고리</string>
+    <string name="memo">메모 (선택)</string>
+    <string name="select_image">이미지 선택</string>
+    <string name="take_photo">카메라로 촬영</string>
+    <string name="choose_from_gallery">갤러리에서 선택</string>
+    <string name="save">저장</string>
+    <string name="image_required">이미지를 선택해주세요</string>
+    
+    <!-- Settings Screen -->
+    <string name="settings">설정</string>
+    <string name="app_lock">앱 잠금</string>
+    <string name="enable_app_lock">앱 잠금 사용</string>
+    <string name="app_lock_description">민감한 정보 보호를 위해 앱 잠금을 설정하세요</string>
+    <string name="change_pin">PIN 변경</string>
+    <string name="use_biometric">생체인증 사용</string>
+    <string name="app_info">앱 정보</string>
+    <string name="version">버전</string>
+    
+    <!-- Lock Screen -->
+    <string name="enter_pin">PIN을 입력하세요</string>
+    <string name="setup_pin">PIN을 설정하세요 (4자리)</string>
+    <string name="confirm_pin">PIN을 다시 입력하세요</string>
+    <string name="pin_mismatch">PIN이 일치하지 않습니다</string>
+    <string name="wrong_pin">잘못된 PIN입니다</string>
+    <string name="too_many_attempts">시도 횟수를 초과했습니다. 잠시 후 다시 시도하세요.</string>
+    <string name="biometric_prompt_title">앱 잠금 해제</string>
+    <string name="biometric_prompt_description">지문 또는 얼굴 인식으로 잠금을 해제하세요</string>
+    <string name="use_pin">PIN 사용</string>
+    
+    <!-- Permissions -->
+    <string name="camera_permission_required">카메라 권한이 필요합니다</string>
+    <string name="storage_permission_required">저장소 권한이 필요합니다</string>
+    <string name="permission_denied">권한이 거부되었습니다</string>
+    <string name="go_to_settings">설정으로 이동</string>
+    
+    <!-- Errors -->
+    <string name="error_occurred">오류가 발생했습니다</string>
+    <string name="file_not_found">파일을 찾을 수 없습니다</string>
+    <string name="file_save_failed">파일 저장에 실패했습니다</string>
+    <string name="cannot_share">공유할 수 없습니다</string>
+    
+    <!-- General -->
+    <string name="ok">확인</string>
+    <string name="edit">수정</string>
+    <string name="close">닫기</string>
+    <string name="retry">다시 시도</string>
+</resources>

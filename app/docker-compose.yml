@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: fileshare_db
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: app_pass
+      POSTGRES_DB: schedule_db
+    volumes:
+      - ../data/db:/var/lib/postgresql/data
+    networks:
+      - fileshare_network
+    restart: always
+
+  backend:
+    build: ./backend
+    container_name: fileshare_backend
+    env_file: ./backend/.env
+    depends_on:
+      - db
+    volumes:
+      - ../data/files:/data/files
+    ports:
+      - "4001:3001"
+    networks:
+      - fileshare_network
+    restart: always
+
+  frontend:
+    build: ./frontend
+    container_name: fileshare_frontend
+    env_file: ./frontend/.env.local
+    depends_on:
+      - backend
+    ports:
+      - "4000:3000"
+    networks:
+      - fileshare_network
+    restart: always
+
+networks:
+  fileshare_network:
+    driver: bridge
