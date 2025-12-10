@@ -1,8 +1,17 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("kotlin-kapt")
+}
+
+// local.properties에서 API_BASE_URL 읽기
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
 }
 
 android {
@@ -21,6 +30,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        
+        // BuildConfig에 API_BASE_URL 추가
+        buildConfigField("String", "API_BASE_URL", "\"${localProperties.getProperty("API_BASE_URL", "http://localhost:4001/")}\"")
     }
 
     buildTypes {
@@ -44,6 +56,7 @@ android {
     
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     
     packaging {

@@ -11,6 +11,7 @@ class DocumentRepository(
 ) {
     
     private val TAG = "DocumentRepository"
+    private val baseUrl = com.fileshare.app.BuildConfig.API_BASE_URL
     
     fun getAllDocuments(): Flow<List<Document>> = flow {
         try {
@@ -27,7 +28,7 @@ class DocumentRepository(
                     try {
                          val attachmentResponse = apiService.getAttachments(item.id)
                          val uris = if(attachmentResponse.isSuccessful) {
-                             attachmentResponse.body()?.map { "http://192.168.0.2:4001/attachments/${it.id}/download" } ?: emptyList() 
+                             attachmentResponse.body()?.map { "${baseUrl}attachments/${it.id}/download" } ?: emptyList() 
                          } else emptyList()
                          
                          Document(
@@ -73,7 +74,7 @@ class DocumentRepository(
                 val item = response.body()!!
                 val attachmentResponse = apiService.getAttachments(item.id)
                 val uris = if (attachmentResponse.isSuccessful) {
-                    attachmentResponse.body()?.map { "http://192.168.0.2:4001/attachments/${it.id}/download" } ?: emptyList()
+                    attachmentResponse.body()?.map { "${baseUrl}attachments/${it.id}/download" } ?: emptyList()
                 } else emptyList()
                 
                 Document(
@@ -98,7 +99,7 @@ class DocumentRepository(
                 val item = response.body()!!
                 val attachmentResponse = apiService.getAttachments(item.id)
                 val uris = if (attachmentResponse.isSuccessful) {
-                    attachmentResponse.body()?.map { "http://192.168.0.2:4001/attachments/${it.id}/download" } ?: emptyList()
+                    attachmentResponse.body()?.map { "${baseUrl}attachments/${it.id}/download" } ?: emptyList()
                 } else emptyList()
                 
                 emit(Document(

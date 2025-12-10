@@ -11,7 +11,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 class AppContainer(context: Context) {
-    private val baseUrl = "http://192.168.0.2:4001/" // NAS backend server
+    // BuildConfig에서 API URL 읽기 (local.properties에 설정)
+    private val baseUrl = BuildConfig.API_BASE_URL
 
     // TokenManager를 AppContainer가 관리 (Singleton 역할)
     val tokenManager = TokenManager(context)
