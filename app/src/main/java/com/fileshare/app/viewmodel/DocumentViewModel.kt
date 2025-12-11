@@ -1,14 +1,16 @@
 package com.fileshare.app.viewmodel
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.fileshare.app.data.local.AppDatabase
 import com.fileshare.app.data.repository.DocumentRepository
 import com.fileshare.app.domain.model.Document
 import com.fileshare.app.util.FileUtils
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DocumentViewModel(application: Application) : AndroidViewModel(application) {
     
@@ -93,7 +95,6 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
                 _isLoading.value = true
                 repository.insertDocument(document)
                 _error.value = null
-                // 문서 추가 후 목록 새로고침
                 refreshDocuments()
             } catch (e: Exception) {
                 _error.value = e.message ?: "문서 추가 실패"
@@ -109,7 +110,6 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
                 _isLoading.value = true
                 repository.updateDocument(document)
                 _error.value = null
-                // 문서 수정 후 목록 및 캐시 새로고침
                 refreshDocuments()
             } catch (e: Exception) {
                 _error.value = e.message ?: "문서 수정 실패"
@@ -123,16 +123,13 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                // Delete files from storage (로컬 파일만 삭제)
                 document.imageUris.forEach { uri ->
                     if (!uri.startsWith("http://") && !uri.startsWith("https://")) {
                         FileUtils.deleteFile(uri)
                     }
                 }
-                // Delete from database
                 repository.deleteDocument(document)
                 _error.value = null
-                // 문서 삭제 후 목록 새로고침
                 refreshDocuments()
             } catch (e: Exception) {
                 _error.value = e.message ?: "문서 삭제 실패"
@@ -141,7 +138,8 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
-    // 문서 상세 캐시 - recomposition 시 API 중복 호출 방지
+
+    // 문서 상세 캐시
     private val _documentCache = mutableMapOf<String, StateFlow<Document?>>()
     
     fun getDocumentById(id: String): StateFlow<Document?> {
@@ -164,12 +162,62 @@ class DocumentViewModel(application: Application) : AndroidViewModel(application
             try {
                 repository.incrementShareCount(documentId)
             } catch (e: Exception) {
-                // Log error but don't show to user
+                // Ignore error
             }
         }
     }
     
     fun clearError() {
         _error.value = null
+    }
+
+    // 문서 공유 기능 (다운로드 후 공유)
+    fun shareDocument(context: Context, document: Document) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
+            try {
+                val filePaths = mutableListOf<String>()
+                val appContainer = (getApplication() as com.fileshare.app.FileShareApplication).container
+                val client = appContainer.okHttpClient
+                
+                // FileUtils가 사용하는 폴더와 동일한 곳에 저장
+                val documentsDir = java.io.File(context.filesDir, "documents")
+                if (!documentsDir.exists()) documentsDir.mkdirs()
+
+                document.imageUris.forEachIndexed { index, uri ->
+                    if (uri.startsWith("http")) {
+                        // 원격 파일 다운로드
+                        val request = okhttp3.Request.Builder().url(uri).build()
+                        val response = client.newCall(request).execute()
+                        if (response.isSuccessful) {
+                            val bytes = response.body?.bytes()
+                            if (bytes != null) {
+                                val ext = if (uri.endsWith(".pdf", true)) "pdf" else "jpg"
+                                val fileName = "share_${document.id}_${System.currentTimeMillis()}_$index.$ext"
+                                val file = java.io.File(documentsDir, fileName)
+                                java.io.FileOutputStream(file).use { it.write(bytes) }
+                                filePaths.add(file.absolutePath)
+                            }
+                        }
+                    } else {
+                        // 로컬 파일
+                        filePaths.add(uri)
+                    }
+                }
+                
+                if (filePaths.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        FileUtils.shareMultipleFiles(context, filePaths)
+                        incrementShareCount(document.id)
+                    }
+                } else {
+                    _error.value = "공유할 파일이 없습니다."
+                }
+            } catch (e: Exception) {
+                 _error.value = "공유 준비 중 오류 발생: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
     }
 }

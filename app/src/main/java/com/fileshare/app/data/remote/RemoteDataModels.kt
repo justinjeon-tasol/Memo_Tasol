@@ -19,8 +19,13 @@ data class ItemResponse(
     @SerializedName("due_date") val dueDate: String,
     @SerializedName("created_at") val createdAt: String,
     @SerializedName("updated_at") val updatedAt: String,
-    @SerializedName("category_id") val categoryId: Long?
-)
+    @SerializedName("category_id") val categoryId: Long?,
+    @SerializedName("created_by") val createdBy: String? = null,
+    @SerializedName("created_by_id") val createdById: String? = null // 백엔드 원본 필드
+) {
+    // created_by 또는 created_by_id 중 하나라도 있으면 반환
+    fun getCreatorId(): String = createdBy ?: createdById ?: ""
+}
 
 // Response for an Attachment (File)
 data class AttachmentResponse(

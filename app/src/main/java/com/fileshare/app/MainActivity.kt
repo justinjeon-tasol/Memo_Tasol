@@ -46,27 +46,25 @@ class MainActivity : ComponentActivity() {
                     val lockViewModel: LockViewModel = viewModel()
                     
                     val appContainer = (application as FileShareApplication).container
-                    // TokenManager를 AppContainer에서 가져옴 (AuthInterceptor와 공유)
                     val tokenManager = appContainer.tokenManager
                     val authRepository = remember { com.fileshare.app.data.repository.AuthRepository(appContainer.apiService, tokenManager) }
                     val loginViewModel = remember { com.fileshare.app.viewmodel.LoginViewModel(authRepository) }
                     
-                    // User Management ViewModel
                     val userManagementViewModel = remember { 
                         com.fileshare.app.viewmodel.UserManagementViewModel(authRepository) 
                     }
 
-                    // Default to Login screen to prevent startup freeze issues
-                    // Auto-Login Logic
                     val isLoggedIn = authRepository.isLoggedIn()
                     val startDestination = if (isLoggedIn) Screen.Main.route else Screen.Login.route
+                    
+                    // Admin 여부 확인 (화면 전환 시마다 갱신될 수 있도록)
+                    val isAdmin = authRepository.isAdmin()
 
                     NavHost(
                         navController = navController,
                         startDestination = startDestination
                     ) {
                         composable(Screen.Login.route) {
-                            // LoginScreen 호출 전에 state를 먼저 가져옵니다.
                             val loginState = loginViewModel.loginState
                             
                             LoginScreen(
@@ -76,7 +74,6 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                             
-                            // Observe login state
                             LaunchedEffect(loginState) {
                                 if (loginState is LoginState.Success) {
                                     navController.navigate(Screen.Main.route) {
@@ -123,7 +120,8 @@ class MainActivity : ComponentActivity() {
                                     onNavigateBack = { navController.popBackStack() },
                                     onNavigateToEdit = { id ->
                                         navController.navigate(Screen.AddEditDocument.createRoute(id))
-                                    }
+                                    },
+                                    isAdmin = isAdmin // 관리자 여부 전달
                                 )
                             }
                         }
@@ -134,13 +132,7 @@ class MainActivity : ComponentActivity() {
                                 documentId = documentId,
                                 documentViewModel = documentViewModel,
                                 categoryViewModel = categoryViewModel,
-                                onNavigateBack = { navController.popBackStack() },
-                                onSaveComplete = {
-                                    // 저장 완료 후 메인 화면으로 이동 (캐시 문제 방지)
-                                    navController.navigate(Screen.Main.route) {
-                                        popUpTo(Screen.Main.route) { inclusive = true }
-                                    }
-                                }
+                                onNavigateBack = { navController.popBackStack() }
                             )
                         }
                         
@@ -161,7 +153,7 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(0) { inclusive = true }
                                     }
                                 },
-                                isAdmin = authRepository.isAdmin()
+                                isAdmin = isAdmin
                             )
                         }
 

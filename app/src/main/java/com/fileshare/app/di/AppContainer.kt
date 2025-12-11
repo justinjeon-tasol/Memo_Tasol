@@ -1,6 +1,7 @@
 package com.fileshare.app.di
 
 import android.content.Context
+import com.fileshare.app.BuildConfig // BuildConfig import 추가
 import com.fileshare.app.data.local.TokenManager
 import com.fileshare.app.data.remote.ApiService
 import com.fileshare.app.data.remote.AuthInterceptor

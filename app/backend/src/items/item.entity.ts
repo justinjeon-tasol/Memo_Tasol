@@ -28,7 +28,7 @@ export class Item {
     @JoinColumn({ name: 'category_id' })
     category: Category;
 
-    @Column({ name: 'category_id' })
+    @Column({ name: 'category_id', nullable: true })
     category_id: number;
 
     @Column({ type: 'text', nullable: true })

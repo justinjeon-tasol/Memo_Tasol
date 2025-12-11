@@ -31,8 +31,8 @@ android {
             useSupportLibrary = true
         }
         
-        // BuildConfig에 API_BASE_URL 추가
-        buildConfigField("String", "API_BASE_URL", "\"${localProperties.getProperty("API_BASE_URL", "http://localhost:4001/")}\"")
+        // 기본값을 NAS 주소로 변경: http://192.168.0.2:4001/
+        buildConfigField("String", "API_BASE_URL", "\"${localProperties.getProperty("API_BASE_URL", "http://192.168.0.2:4001/")}\"")
     }
 
     buildTypes {

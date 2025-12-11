@@ -14,11 +14,32 @@ export class ItemsService {
     ) { }
 
     async create(createItemDto: any, userId: string) {
-        const item = this.itemsRepository.create({
+        const itemData = {
             ...createItemDto,
             created_by_id: userId,
-        });
-        return this.itemsRepository.save(item);
+        };
+        const item = this.itemsRepository.create(itemData);
+        const savedItem = await this.itemsRepository.save(item);
+        // savedItem은 단일 엔티티를 전달했으므로 단일 엔티티로 반환됨
+        const result = Array.isArray(savedItem) ? savedItem[0] : savedItem;
+        return this.toResponseDto(result);
+    }
+
+    private toResponseDto(item: Item) {
+        return {
+            id: item.id,
+            title: item.title,
+            description: item.description,
+            due_date: item.due_date,
+            category_id: item.category_id,
+            status: item.status,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            created_by: item.created_by_id, // 안드로이드 앱이 기대하는 필드명
+            assignee_id: item.assignee_id,
+            category: item.category,
+            assignee: item.assignee,
+        };
     }
 
     async findAll(query: any) {
@@ -32,23 +53,29 @@ export class ItemsService {
             where.due_date = Between(query.from_date, query.to_date);
         }
 
-        return this.itemsRepository.find({
+        const items = await this.itemsRepository.find({
             where,
             relations: ['category', 'assignee'],
             order: { due_date: 'ASC' },
         });
+
+        return items.map(item => this.toResponseDto(item));
     }
 
     async findOne(id: string) {
-        return this.itemsRepository.findOne({
+        const item = await this.itemsRepository.findOne({
             where: { id },
             relations: ['category', 'assignee'],
         });
+        return item ? this.toResponseDto(item) : null;
     }
 
     async update(id: string, updateItemDto: any, userId: string) {
         await this.itemsRepository.update(id, updateItemDto);
-        const after = await this.findOne(id);
+        const after = await this.itemsRepository.findOne({
+            where: { id },
+            relations: ['category', 'assignee'],
+        });
 
         if (after) {
             const history = this.historyRepository.create({
@@ -63,7 +90,7 @@ export class ItemsService {
             await this.historyRepository.save(history);
         }
 
-        return after;
+        return after ? this.toResponseDto(after) : null;
     }
 
     async remove(id: string) {
@@ -107,6 +134,6 @@ export class ItemsService {
         });
         await this.historyRepository.save(history);
 
-        return item;
+        return this.toResponseDto(item);
     }
 }

@@ -44,9 +44,8 @@ fun LoginScreen(
                 .fillMaxSize()
                 .background(Color.White)
                 .verticalScroll(scrollState)
-                .imePadding() // 키보드가 올라오면 자동으로 패딩 추가
+                .imePadding()
         ) {
-            // Header Section (Green)
             // Header Section (Green)
             Box(
                 modifier = Modifier
@@ -72,7 +71,6 @@ fun LoginScreen(
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    // Icon Placeholder (Circle with User/Lock)
                     Surface(
                         shape = androidx.compose.foundation.shape.CircleShape,
                         color = Color.White.copy(alpha = 0.2f),
@@ -124,7 +122,9 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.LightGray, 
-                        unfocusedBorderColor = Color.LightGray
+                        unfocusedBorderColor = Color.LightGray,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -141,7 +141,9 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.LightGray,
-                        unfocusedBorderColor = Color.LightGray
+                        unfocusedBorderColor = Color.LightGray,
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -155,17 +157,23 @@ fun LoginScreen(
                         checked = saveId,
                         onCheckedChange = { saveId = it },
                         enabled = !isLoading,
-                        colors = CheckboxDefaults.colors(checkedColor = LoginGreen)
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = LoginGreen,
+                            uncheckedColor = Color.Gray
+                        )
                     )
-                    Text("ID 저장", fontSize = 14.sp)
+                    Text("ID 저장", fontSize = 14.sp, color = Color.Black)
                     Spacer(modifier = Modifier.width(16.dp))
                     Checkbox(
                         checked = savePw,
                         onCheckedChange = { savePw = it },
                         enabled = !isLoading,
-                        colors = CheckboxDefaults.colors(checkedColor = LoginGreen)
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = LoginGreen,
+                            uncheckedColor = Color.Gray
+                        )
                     )
-                    Text("PW 저장", fontSize = 14.sp)
+                    Text("PW 저장", fontSize = 14.sp, color = Color.Black)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
 

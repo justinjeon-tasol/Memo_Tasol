@@ -1,6 +1,5 @@
 package com.fileshare.app.ui.screens.settings
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +23,11 @@ fun UserListScreen(
 ) {
     val users by viewModel.users.collectAsState()
     var showPasswordResetDialog by remember { mutableStateOf<UserDto?>(null) }
+    
+    // 화면 진입 시 데이터 로드
+    LaunchedEffect(Unit) {
+        viewModel.loadUsers()
+    }
 
     Scaffold(
         topBar = {
@@ -32,6 +36,11 @@ fun UserListScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, "뒤로")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.loadUsers() }) {
+                        Icon(Icons.Default.Refresh, "새로고침")
                     }
                 }
             )
@@ -42,34 +51,66 @@ fun UserListScreen(
             }
         }
     ) { paddingValues ->
-        if (viewModel.isLoading) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            items(users) { user ->
-                ListItem(
-                    headlineContent = { Text(user.username) },
-                    supportingContent = { Text("Role: ${user.role} | Active: ${user.isActive}") },
-                    leadingContent = {
-                        Icon(
-                            if (user.role == UserRole.ADMIN) Icons.Default.AdminPanelSettings else Icons.Default.Person,
-                            null
-                        )
-                    },
-                    trailingContent = {
-                        IconButton(onClick = { showPasswordResetDialog = user }) {
-                            Icon(Icons.Default.LockReset, "비밀번호 초기화")
-                        }
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            } else if (viewModel.error != null) {
+                // 에러 메시지 표시
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.ErrorOutline,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(48.dp)
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        text = viewModel.error ?: "알 수 없는 오류",
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = { viewModel.loadUsers() }) {
+                        Text("다시 시도")
                     }
-                )
-                Divider()
+                }
+            } else if (users.isEmpty()) {
+                // 빈 목록 표시
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text("등록된 사용자가 없습니다.")
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(users) { user ->
+                        ListItem(
+                            headlineContent = { Text(user.username) },
+                            supportingContent = { Text("Role: ${user.role} | Active: ${user.isActive}") },
+                            leadingContent = {
+                                Icon(
+                                    if (user.role == UserRole.ADMIN) Icons.Default.AdminPanelSettings else Icons.Default.Person,
+                                    null
+                                )
+                            },
+                            trailingContent = {
+                                IconButton(onClick = { showPasswordResetDialog = user }) {
+                                    Icon(Icons.Default.LockReset, "비밀번호 초기화")
+                                }
+                            }
+                        )
+                        Divider()
+                    }
+                }
             }
         }
 
